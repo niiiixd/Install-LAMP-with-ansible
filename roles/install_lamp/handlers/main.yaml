@@ -1,7 +1,13 @@
 ---
-- name: Restart postfix
+- name: Restart httpd
   service:
-    name: postfix
+    name: httpd
     state: restarted
     enabled: yes
-  tags: [restart_postfix]
+  tags: [restart_httpd]
+- name: Restart mariadb
+  service:
+    name: mariadb
+    state: restarted
+    enabled: yes
+  tags: [restart_mariadb]

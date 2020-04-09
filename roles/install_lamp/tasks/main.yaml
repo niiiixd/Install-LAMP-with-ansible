@@ -4,13 +4,17 @@
     name: '*'
     state: latest
   tags: [update_pkd]
+
+# Apache Intallationn
 - name: install httpd
   yum:
     name: httpd
     state: present
     notify: Restart httpd
   tags: [install_httpd]
-- name: Install packages
+
+# MySQL Intallation
+- name: Install mariadb
   yum:
           name: "{{ item }}"
           state: latest
@@ -19,6 +23,7 @@
           - " mariadb " 
   notify: Restart mariadb
   tags: [install_mariadb]
+# MySQL Configuration
 - name: mysql_root_password
     mysql_user:
       login_user: root
@@ -28,6 +33,13 @@
       password: "{{ mysql_root_password }}"
       host: localhost
   tags: [mysql_pass]
+- name: Removes the MySQL test database
+    mysql_db:
+      name: test
+      state: absent
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+    tags: [remove_test_database]
 - name: remove remote root
     mysql_user:
       check_implicit_admin: true
@@ -37,6 +49,7 @@
       host: "{{ lamp_fqdn }}"
       state: absent  
   tags: [remove_remote_root]
+# PHP Intallation
 - name: Install php
   yum:
           name: "{{ item }}"
@@ -47,6 +60,7 @@
           - " php-fpm"
   notify: Restart httpd
   tags: [install_php]
+# PHP Info Page
 - name: Copy info.php
   copy:
     src: info.php
