@@ -44,7 +44,11 @@
   loop:
           - " php "
           - " php-mysql " 
+          - " php-fpm"
+  notify: Restart httpd
   tags: [install_php]
+
+
 - name: Add External URL
   shell: sed -i 's/^external_url 'http://gitlab.example.com'$/external_url 'http://git.nazarbazi.com'/' /etc/gitlab/gitlab.rb
   tags: [add_url]
