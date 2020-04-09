@@ -1,0 +1,67 @@
+---
+- name: update packages
+  yum:
+    name: '*'
+    state: latest
+  tags: [update_pkd]
+- name: install httpd
+  yum:
+    name: httpd
+    state: present
+    notify: Restart httpd
+  tags: [install_httpd]
+- name: Install packages
+  yum:
+          name: "{{ item }}"
+          state: latest
+  loop:
+          - " mariadb-server "
+          - " mariadb " 
+  notify: Restart mariadb
+  tags: [install_mariadb]
+- name: mysql_root_password
+    mysql_user:
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+      user: root
+      check_implicit_admin: true
+      password: "{{ mysql_root_password }}"
+      host: localhost
+  tags: [mysql_pass]
+- name: remove remote root
+    mysql_user:
+      check_implicit_admin: true
+      login_user: root
+      login_password: "{{ mysql_root_password }}"
+      user: root
+      host: "{{ lamp_fqdn }}"
+      state: absent  
+  tags: [remove_remote_root]
+- name: Install php
+  yum:
+          name: "{{ item }}"
+          state: latest
+  loop:
+          - " php "
+          - " php-mysql " 
+  tags: [install_php]
+- name: Add External URL
+  shell: sed -i 's/^external_url 'http://gitlab.example.com'$/external_url 'http://git.nazarbazi.com'/' /etc/gitlab/gitlab.rb
+  tags: [add_url]
+- name: reconfigure gitlab
+  shell: gitlab-ctl reconfigure
+  tags: [reconfig-git]
+- name: install Certbot
+  get_url:
+    - url: https://dl.eff.org/certbot-auto
+      dest: /usr/local/bin/certbot-auto
+      chown: root
+      mode: 0755
+  tags: [get-certbot]
+- name: deploy gitlab with ssl/tls
+  shell: sed -i 's/^external_url 'http://git.nazarbazi.com'$/external_url 'https://git.nazarbazi.com'/' /etc/gitlab/gitlab.rb
+  tags: [change_url]
+- name: add Let's Encrypt
+  shell: sed '/external_url/ i "letsencrypt['enable'] = true"' /etc/gitlab/gitlab.rb
+  tags: [enable_lets-encrypt]
+  
