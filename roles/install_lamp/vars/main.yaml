@@ -1,7 +1,7 @@
 ---
-mysql_root_password: "mysql_root_password"
+mysql_root_password: "123"
 app_user: "nix"
-http_host: "your_domain"
-http_conf: "your_domain.conf"
-http_port: "80"
+http_host: "nazarbazi.ir"
+#http_conf: "your_domain.conf"
+#http_port: "80"
 disable_default: true
